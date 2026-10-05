@@ -1,99 +1,183 @@
-# Film RAG Evaluation
+# Film Intelligence Assistant
 
-## Overview
+A full-stack film-domain AI assistant built with React, FastAPI, retrieval-augmented generation, TMDB tool calling, persistent conversation memory, and an evaluation workspace for comparing different answer-generation strategies.
 
-This project originated as a film-focused AI assistant coursework notebook. It combines:
-
-- OpenAI-based language model interaction (Assistants API, `gpt-4o-mini`)
-- Retrieval-Augmented Generation over film-related markdown documents
-- TMDB API integration for live movie metadata
-- tool / function calling so the assistant can request TMDB details
-- domain-specific film questions about Park Chan-wook, selected films, and film noir
-
-The current repository is being prepared as an **evaluation-oriented RAG project**. The notebook already runs a RAG + TMDB assistant; a systematic evaluation harness is **not** implemented yet.
+This project started as a university film assistant prototype and has since been restructured into a modular AI application for experimenting with domain-specific retrieval, tool use, memory, and evaluation.
 
 ## Current Capabilities
 
-Features that exist in `notebooks/Film_Assistant.ipynb` today:
+### Film-domain question answering
 
-- Load `OPENAI_API_KEY` and `TMDB_API_KEY` from environment variables
-- Create an OpenAI assistant with `file_search` and a `get_movie_details_tmdb` function tool
-- Upload local RAG documents into an OpenAI vector store and attach it to the assistant
-- Search TMDB by title and return director, release date, genres, overview, runtime, and ratings
-- Run a conversation thread, poll for `requires_action`, execute the local TMDB function, and print the assistant reply
-- Include sample film-analysis questions and saved example responses in the notebook
+The assistant supports three answer modes:
 
-This repository does **not** yet compute evaluation metrics, comparison tables, or retrieval scores.
+- **LLM only** — answers using the language model without retrieval or external tools.
+- **RAG** — retrieves relevant chunks from a local film knowledge base before generating an answer.
+- **RAG + TMDB** — combines retrieval with live movie metadata from the TMDB API.
+
+The current retrieval pipeline uses:
+
+- Markdown film documents
+- paragraph-aware chunking
+- OpenAI `text-embedding-3-small`
+- cosine similarity with NumPy
+- top-k retrieval
+- no external vector database
+
+### TMDB tool integration
+
+For movie metadata queries, the assistant can call TMDB to retrieve information such as:
+
+- title
+- director
+- release date
+- genres
+- runtime
+- rating
+- plot overview
+
+Tool calling is handled through the backend and is available in `rag_tmdb` mode.
+
+### Persistent conversations
+
+Conversation state is stored in SQLite.
+
+Stored data includes:
+
+- conversations
+- user messages
+- assistant messages
+- selected answer mode
+- timestamps
+
+Conversation history remains available after backend restarts.
+
+### Memory
+
+The assistant includes a simple persistent memory layer.
+
+Current memory types:
+
+- `preference`
+- `topic`
+- `fact`
+- `summary`
+
+Memory extraction is intentionally conservative. The system does not store every message. It only records clear reusable statements such as user preferences or previously discussed topics.
+
+Users can inspect and delete stored memories from the frontend.
+
+### Evaluation workspace
+
+The Evaluation page can compare the same film-domain question across:
+
+- LLM only
+- RAG
+- RAG + TMDB
+
+For each mode, the system records:
+
+- generated answer
+- latency
+- retrieved sources
+- source count
+- tool calls
+- errors
+
+Each mode runs independently and evaluation runs are not stored as normal chat conversations.
+
+Automatic groundedness, hallucination, and factual-accuracy scoring are planned but not implemented yet.
 
 ## Architecture
 
-```
-User Question
-    ↓
-Film AI Assistant
-    ↓
-┌──────────────┬──────────────┐
-│ RAG / KB     │ TMDB API     │
-│ film docs    │ movie data   │
-└──────────────┴──────────────┘
-        ↓
-     LLM Answer
+```text
+React Frontend
+      |
+      v
+FastAPI Backend
+      |
+      +-----------------------+
+      |                       |
+      v                       v
+Conversation / Memory      AI Services
+SQLite                     |
+                            +-----------------------+
+                            |           |           |
+                            v           v           v
+                           LLM         RAG         TMDB
+                                        |
+                                        v
+                                  Film Knowledge Base
 ```
 
-The assistant is instructed to query the vector store first (`file_search`), then fall back to TMDB when the knowledge base is insufficient or when up-to-date movie data is needed.
+The React app talks to FastAPI over `/api`. Chat, memory, and evaluation share the same generation services. Conversations and memories are written to SQLite. RAG reads `data/rag/` markdown files; TMDB is called only in `rag_tmdb` mode.
 
 ## Project Structure
 
-```
+```text
 film-rag-evaluation/
-├── notebooks/Film_Assistant.ipynb   # original coursework assistant
-├── data/rag/                        # film knowledge-base documents
-├── docs/film-assistant-report.pdf   # original written report
-├── results/                         # reserved for future evaluation outputs
-├── .env.example                     # environment variable names only
+├── frontend/                 # React + TypeScript + Vite UI
+├── backend/                  # FastAPI app, retrieval, TMDB, SQLite
+├── data/rag/                 # film knowledge-base documents
+├── notebooks/                # original coursework assistant notebook
+├── docs/                     # original written report
+├── results/                  # reserved for later evaluation artifacts
+├── .env.example
 ├── .gitignore
 ├── requirements.txt
 └── README.md
 ```
 
-- `notebooks/` — runnable assistant notebook
-- `data/rag/` — markdown sources used for RAG (Park Chan-wook, *Decision to Leave*, *The Handmaiden*, *Stoker*, film noir)
-- `docs/` — coursework report PDF
-- `results/` — empty placeholder for later evaluation artifacts
+The original notebook remains in `notebooks/Film_Assistant.ipynb`. The running product is the FastAPI backend and React frontend.
 
 ## Setup
 
-1. Create and activate a local virtual environment from the project root:
+1. Create a virtual environment and install Python dependencies:
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
+pip install -r backend/requirements.txt
 ```
 
-2. Copy the example environment file and set real keys **outside Git** (export them, or keep a local `.env` that is gitignored):
+2. Set API keys in the environment. Do not commit them.
 
 ```bash
-cp .env.example .env
 export OPENAI_API_KEY="your-openai-key"
 export TMDB_API_KEY="your-tmdb-key"
 ```
 
-3. Open `notebooks/Film_Assistant.ipynb` in Jupyter or VS Code/Cursor from the project root or the `notebooks/` folder. The notebook looks for `data/rag/` locally and only tries Google Drive if those files are missing.
+`.env.example` lists the variable names only. SQLite is created automatically at `data/app.sqlite` (gitignored).
 
-Running the assistant cells calls OpenAI and TMDB and will incur API usage.
+3. Start the backend:
+
+```bash
+cd backend
+uvicorn app.main:app --reload --port 8000
+```
+
+4. Start the frontend:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Open `http://localhost:5173`. The Vite dev server proxies `/api` to `http://127.0.0.1:8000`.
+
+Chat, retrieval, TMDB, and evaluation all require a funded OpenAI key. Missing keys or quota failures are returned as errors; the UI does not invent answers.
 
 ## Security
 
-API credentials are loaded from environment variables (`OPENAI_API_KEY`, `TMDB_API_KEY`) and must not be hardcoded or committed. `.gitignore` excludes `.env`. `.env.example` contains placeholders only.
+API credentials are loaded from environment variables (`OPENAI_API_KEY`, `TMDB_API_KEY`) and must not be hardcoded or committed. `.gitignore` excludes `.env` and SQLite database files. `.env.example` contains placeholders only.
 
 ## Future Work
 
-The following items are **planned**, not implemented:
+The following items are planned, not implemented:
 
-- evaluation dataset
-- LLM-only vs RAG vs RAG+TMDB comparison
-- retrieval relevance
-- groundedness / hallucination analysis
-- latency comparison
-- result visualization
+- groundedness scoring
+- hallucination analysis
+- automatic factual-accuracy scoring
+- batch evaluation datasets
+- GraphRAG
+- richer memory, including automatic summaries

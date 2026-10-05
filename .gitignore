@@ -1,6 +1,11 @@
+*.db
+*.sqlite
+*.sqlite3
 .env
 .DS_Store
 __pycache__/
 .ipynb_checkpoints/
 .venv/
 venv/
+node_modules/
+frontend/dist/
