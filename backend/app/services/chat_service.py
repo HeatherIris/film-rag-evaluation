@@ -11,9 +11,28 @@ from app.models.schemas import ChatMode, ChatResponse, Message, Source, ToolCall
 from app.services.graph_service import format_graph_context, retrieve_graph
 from app.services.rag_service import CRITIC_INSTRUCTIONS
 from app.services.retrieval_service import format_context, retrieve
+from app.services.scene_retrieval import (
+    all_scene_context,
+    format_scene_context,
+    retrieve_scenes_graph,
+    retrieve_scenes_vector,
+)
 from app.services.tmdb_service import AVAILABLE_FUNCTIONS, TMDB_TOOL_SCHEMA
 
 MODEL = "gpt-4o-mini"
+
+SCENE_MODES = ("scene_vector", "scene_graph", "scene_full")
+
+# Shared by every scene mode so that the conditions differ only in what context they get.
+SCENE_ANSWER_FORMAT = (
+    "Answer in three labelled parts:\n"
+    "Observed in the film: facts taken from the scene notes, each followed by the scene or event id "
+    "it comes from, e.g. (s03.e1). Use document excerpts or graph facts only for credits and background.\n"
+    "Interpretation: readings of meaning or intent. Say whose reading it is (an interpretation record "
+    "in the notes, or your own) and which observed facts it rests on. Write 'none' if not asked.\n"
+    "Not covered: anything the question asks that the notes do not show. Do not fill gaps from "
+    "general knowledge of the film; if the notes do not cover the question, say so here."
+)
 
 
 def _client() -> OpenAI:
@@ -26,7 +45,19 @@ def _client() -> OpenAI:
     return OpenAI(api_key=api_key)
 
 
-def _system_prompt(mode: ChatMode, rag_context: str | None, graph_context: str | None = None) -> str:
+def _system_prompt(
+    mode: ChatMode,
+    rag_context: str | None,
+    graph_context: str | None = None,
+    scene_context: str | None = None,
+) -> str:
+    if mode in SCENE_MODES:
+        blocks = [scene_context]
+        if graph_context:
+            blocks.append(graph_context)
+        if rag_context:
+            blocks.append(f"Document excerpts:\n{rag_context}")
+        return f"{CRITIC_INSTRUCTIONS} {SCENE_ANSWER_FORMAT}\n\n" + "\n\n".join(blocks)
     if mode == "llm":
         return (
             f"{CRITIC_INSTRUCTIONS} Answer from general film knowledge only. "
@@ -81,17 +112,30 @@ def generate_reply(
     tools_used: list[ToolCallRecord] = []
     rag_context = None
     graph_context = None
+    scene_context = None
 
-    if mode in ("rag", "rag_tmdb", "graph_rag"):
+    # Conditions of docs/scene_knowledge_design.md:
+    # A = rag, B = scene_vector, C = graph_rag, D = scene_graph, E = scene_full.
+    if mode in ("rag", "rag_tmdb", "graph_rag", *SCENE_MODES):
         sources = retrieve(user_message)
         rag_context = format_context(sources)
-    if mode in ("graph", "graph_rag"):
+    if mode in ("graph", "graph_rag", "scene_graph"):
         graph_sources = retrieve_graph(user_message)
         graph_context = format_graph_context(graph_sources)
         sources = graph_sources + sources
+    if mode in SCENE_MODES:
+        if mode == "scene_vector":
+            scene_sources = retrieve_scenes_vector(user_message)
+            scene_context = format_scene_context(scene_sources)
+        elif mode == "scene_graph":
+            scene_sources = retrieve_scenes_graph(user_message)
+            scene_context = format_scene_context(scene_sources)
+        else:
+            scene_context, scene_sources = all_scene_context()
+        sources = scene_sources + sources
 
     messages: list[dict] = [
-        {"role": "system", "content": _system_prompt(mode, rag_context, graph_context)},
+        {"role": "system", "content": _system_prompt(mode, rag_context, graph_context, scene_context)},
         *_history_messages(history),
         {"role": "user", "content": user_message},
     ]

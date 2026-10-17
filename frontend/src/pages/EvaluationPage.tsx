@@ -9,6 +9,9 @@ const MODES: { value: ChatMode; label: string }[] = [
   { value: "rag_tmdb", label: "RAG + TMDB" },
   { value: "graph", label: "Graph" },
   { value: "graph_rag", label: "Graph + RAG" },
+  { value: "scene_vector", label: "Scenes (vector)" },
+  { value: "scene_graph", label: "Scenes (graph)" },
+  { value: "scene_full", label: "Scenes (all notes)" },
 ];
 
 const MODE_LABEL: Record<ChatMode, string> = {
@@ -17,6 +20,9 @@ const MODE_LABEL: Record<ChatMode, string> = {
   rag_tmdb: "RAG + TMDB",
   graph: "Graph",
   graph_rag: "Graph + RAG",
+  scene_vector: "Scenes (vector)",
+  scene_graph: "Scenes (graph)",
+  scene_full: "Scenes (all notes)",
 };
 
 export function EvaluationPage() {

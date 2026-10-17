@@ -1,6 +1,7 @@
 # Scene-level Knowledge Layer: Design
 
-Status: design only. Nothing in this document is implemented yet, and no results exist.
+Status: code implemented and tested on a fictional demo film (`backend/tests/`). The scene notes for
+*The Handmaiden* and the question set are not written yet, so no results exist. Annotation steps: `docs/annotation_guide.md`.
 
 ## 1. Why
 
@@ -36,28 +37,32 @@ No video, subtitles, or script text.
 
 ## 3. Data model
 
-One file per scene in `data/scenes/the_handmaiden/scene_XX.json`.
+Scene notes are written by hand as Markdown from a fixed template (easier to write than JSON) and
+parsed without any LLM into JSON (`scripts/scenes_check.py` → `results/scenes_<film>.json`).
 
-```json
-{
-  "scene_id": "handmaiden_s03",
-  "film": "The Handmaiden",
-  "part": 1,
-  "start": "00:18:00",
-  "end": "00:20:00",
-  "point_of_view": "Sook-hee",
-  "characters": ["Sook-hee", "Hideko"],
-  "events": [
-    {"id": "e1", "text": "<what is visibly done, in my words>", "agent": "Sook-hee", "objects": ["<object>"]}
-  ],
-  "objects": ["<object>"],
-  "dialogue_summary": "<paraphrase, no quotes longer than a few words>",
-  "camera_notes": "<framing / movement I observed>",
-  "provenance": {"source": "manual_viewing", "annotator": "HeatherIris", "verified": true}
-}
+```
+data/scenes/
+├── _template/{film.md, scene.md}
+└── the_handmaiden/
+    ├── film.md      canonical character / object names and aliases
+    └── s01.md ...   one file per scene
 ```
 
-Cross-scene links live in `data/scenes/the_handmaiden/links.json`:
+A scene file has a front-matter block (`scene_id`, `part`, `start`, `end`, `pov`, `location`, `verified`,
+`verified_on`) and these sections:
+
+| Section | Content |
+| --- | --- |
+| Description | 3–6 sentences in my own words; the only input of the extraction experiment |
+| Characters | names, mapped to canonical names via `film.md` |
+| Events | `e1 \| agent \| observable action \| objects: a, b \| uncertain` |
+| Objects | objects in the scene |
+| Dialogue summary | paraphrase, no long quotes |
+| Camera | framing, movement, light, sound I noticed |
+| Links | `e1 retells s09.e2 \| unverified \| note: ...` |
+| Interpretations | `c1 \| attributed to \| reading \| supports: s03.e1, s09.e2` |
+
+Link predicates:
 
 | Predicate | Meaning |
 | --- | --- |
@@ -66,21 +71,12 @@ Cross-scene links live in `data/scenes/the_handmaiden/links.json`:
 | `follows_from` | an event in B is a consequence of an event in A |
 | `contradicts` | B reveals that what A showed (or implied) was false |
 
-Every link carries `evidence` (the event ids on both sides), `source` and `verified`.
-A wrong `same_object` link can make the graph spread an error, so unverified links are kept
-separate and evaluated as such.
+Links are written in the later scene and point back; retrieval follows them in both directions.
+Unverified links are flagged in the prompt and counted separately. Interpretations are never graph
+edges between facts; each one must cite the events it rests on.
 
-Interpretations are separate records, never edges between facts:
-
-```json
-{
-  "claim_id": "c1",
-  "claim": "<a reading of the scene>",
-  "supported_by": ["handmaiden_s03.e1", "handmaiden_s21.e2"],
-  "attributed_to": "my reading | <critic, with citation>",
-  "kind": "interpretation"
-}
-```
+`backend/app/services/scene_store.py` parses and validates the files (unknown names, objects not listed,
+links to missing scenes or events, interpretations without evidence, verified without a date).
 
 ## 4. Pipeline
 
@@ -97,6 +93,11 @@ Interpretations are separate records, never edges between facts:
 ## 5. Experiment
 
 ### Conditions
+
+Modes in `chat_service.py`: A `rag`, B `scene_vector`, C `graph_rag`, D `scene_graph`, E `scene_full`.
+All scene modes share one answer format (Observed in the film / Interpretation / Not covered) and also
+receive the document excerpts, so the conditions differ only in how scene knowledge is selected.
+`scene_graph` = vector seeds + scenes sharing a named object (or all named characters) + one hop along links.
 
 | | Metadata only | + verified scene notes |
 | --- | --- | --- |

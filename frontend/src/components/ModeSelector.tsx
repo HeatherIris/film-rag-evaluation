@@ -6,6 +6,9 @@ const OPTIONS: { value: ChatMode; label: string }[] = [
   { value: "rag_tmdb", label: "RAG + TMDB" },
   { value: "graph", label: "Graph" },
   { value: "graph_rag", label: "Graph + RAG" },
+  { value: "scene_vector", label: "Scenes (vector)" },
+  { value: "scene_graph", label: "Scenes (graph)" },
+  { value: "scene_full", label: "Scenes (all notes)" },
 ];
 
 type ModeSelectorProps = {

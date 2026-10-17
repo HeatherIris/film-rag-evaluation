@@ -1,4 +1,12 @@
-export type ChatMode = "llm" | "rag" | "rag_tmdb" | "graph" | "graph_rag";
+export type ChatMode =
+  | "llm"
+  | "rag"
+  | "rag_tmdb"
+  | "graph"
+  | "graph_rag"
+  | "scene_vector"
+  | "scene_graph"
+  | "scene_full";
 
 export type ConversationSummary = {
   conversation_id: string;

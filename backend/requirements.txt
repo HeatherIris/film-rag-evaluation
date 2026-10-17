@@ -4,3 +4,7 @@ openai
 requests
 numpy
 rdflib
+
+# tests
+pytest
+httpx

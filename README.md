@@ -8,13 +8,14 @@ This project started as a university film assistant prototype and has since been
 
 ### Film-domain question answering
 
-The assistant supports five answer modes:
+The assistant supports eight answer modes:
 
 - **LLM only** — answers using the language model without retrieval or external tools.
 - **RAG** — retrieves relevant chunks from a local film knowledge base before generating an answer.
 - **RAG + TMDB** — combines retrieval with live movie metadata from the TMDB API.
 - **Graph** — answers only from facts retrieved from the film knowledge graph, and says so when the graph does not cover the question.
 - **Graph + RAG** — gives the model both graph facts (credits, relationships) and document chunks (plot, style, themes).
+- **Scenes (vector)**, **Scenes (graph)**, **Scenes (all notes)** — add hand-written scene notes, selected by text similarity, by graph expansion along annotated cross-scene links, or all of them without retrieval. See below.
 
 The current retrieval pipeline uses:
 
@@ -58,6 +59,21 @@ Known limitations:
 - Spelling variants are merged with a manual alias table (`ALIASES` in `graph_build.py`), e.g. `Jo Yeong-wook` → `Cho Young-wuk`, `Jeong Seo-kyeong` → `Jeong Seo-kyung`.
 - The hub threshold (30) and the 40-fact limit were chosen by inspecting a few questions, not tuned.
 - No accuracy comparison between Graph, Graph + RAG and RAG has been run yet.
+
+### Scene-level knowledge (in progress)
+
+The metadata graph cannot answer what happens in a scene or how two distant scenes relate. The scene layer adds
+hand-written, verified scene notes: events, objects, point of view, cross-scene links (`retells`, `same_object`,
+`follows_from`, `contradicts`) and attributed interpretations that must cite events.
+
+- Design and experiment plan: [docs/scene_knowledge_design.md](docs/scene_knowledge_design.md)
+- How to write, verify and grade (the manual part): [docs/annotation_guide.md](docs/annotation_guide.md)
+- Code: `scene_store.py` (parse + validate), `scene_retrieval.py` (vector / graph / full context), scene modes in `chat_service.py`
+- Scripts: `new_scene.py`, `scenes_check.py`, `run_eval.py`, `summarize_eval.py`, `extract_scenes.py`
+- Tests: `cd backend && python -m pytest -q tests` (uses a small fictional film, no API key)
+
+Status: the code is tested on the fictional film only. Scene notes for *The Handmaiden* and the question set
+have not been written yet, so there are no results.
 
 ### TMDB tool integration
 
@@ -111,6 +127,9 @@ The Evaluation page can compare the same film-domain question across:
 - RAG + TMDB
 - Graph
 - Graph + RAG
+- Scenes (vector / graph / all notes)
+
+`scripts/run_eval.py` runs a whole question CSV through the five conditions of the scene experiment and writes a CSV for manual grading; `scripts/summarize_eval.py` aggregates the graded file.
 
 For each mode, the system records:
 
@@ -157,7 +176,9 @@ film-rag-evaluation/
 ├── frontend/                 # React + TypeScript + Vite UI
 ├── backend/                  # FastAPI app, retrieval, knowledge graph, TMDB, SQLite
 ├── data/rag/                 # film knowledge-base documents
-├── scripts/                  # graph demo and RDF/Turtle export
+├── data/scenes/              # hand-written scene notes (template + one folder per film)
+├── data/eval/                # evaluation question sets
+├── scripts/                  # graph demo, RDF export, scene notes check, evaluation and extraction
 ├── notebooks/                # original coursework assistant notebook
 ├── docs/                     # original written report
 ├── results/                  # exported graph (film_graph.ttl); later evaluation artifacts
@@ -218,7 +239,6 @@ The following items are planned, not implemented:
 - groundedness scoring
 - hallucination analysis
 - automatic factual-accuracy scoring
-- batch evaluation datasets, including a Graph vs RAG comparison
+- run the scene experiment on *The Handmaiden* (notes and questions to be written)
 - LLM-based entity and relation extraction from the plot and theme paragraphs
-- scene-level knowledge layer (scenes, events, cross-scene links, attributed interpretations); see [docs/scene_knowledge_design.md](docs/scene_knowledge_design.md)
 - richer memory, including automatic summaries

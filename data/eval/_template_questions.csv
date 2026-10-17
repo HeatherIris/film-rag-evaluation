@@ -1,0 +1,6 @@
+qid,type,question,reference_answer,evidence,answerable,notes
+q01,L1,Who was the cinematographer of The Handmaiden?,Chung Chung-hoon,,yes,metadata question
+q02,L2_single,<question about one scene>,<short reference answer>,s03.e1,yes,
+q03,L2_cross,<question that needs two scenes>,<short reference answer>,s03.e1;s09.e2,yes,
+q04,L3,<why / what might it mean>,<what a good answer must mention>,s03;s09,yes,interpretation: grade on evidence use
+q05,unanswerable,<question your notes do not cover>,NOT_COVERED,,no,the system should say it is not covered
