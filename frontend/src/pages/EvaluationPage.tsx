@@ -7,12 +7,16 @@ const MODES: { value: ChatMode; label: string }[] = [
   { value: "llm", label: "LLM only" },
   { value: "rag", label: "RAG" },
   { value: "rag_tmdb", label: "RAG + TMDB" },
+  { value: "graph", label: "Graph" },
+  { value: "graph_rag", label: "Graph + RAG" },
 ];
 
 const MODE_LABEL: Record<ChatMode, string> = {
   llm: "LLM only",
   rag: "RAG",
   rag_tmdb: "RAG + TMDB",
+  graph: "Graph",
+  graph_rag: "Graph + RAG",
 };
 
 export function EvaluationPage() {

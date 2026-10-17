@@ -4,6 +4,8 @@ const OPTIONS: { value: ChatMode; label: string }[] = [
   { value: "llm", label: "LLM only" },
   { value: "rag", label: "RAG" },
   { value: "rag_tmdb", label: "RAG + TMDB" },
+  { value: "graph", label: "Graph" },
+  { value: "graph_rag", label: "Graph + RAG" },
 ];
 
 type ModeSelectorProps = {

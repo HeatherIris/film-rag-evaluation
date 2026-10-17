@@ -1,4 +1,4 @@
-export type ChatMode = "llm" | "rag" | "rag_tmdb";
+export type ChatMode = "llm" | "rag" | "rag_tmdb" | "graph" | "graph_rag";
 
 export type ConversationSummary = {
   conversation_id: string;

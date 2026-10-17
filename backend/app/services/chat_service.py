@@ -8,6 +8,7 @@ from fastapi import HTTPException, status
 from openai import OpenAI
 
 from app.models.schemas import ChatMode, ChatResponse, Message, Source, ToolCallRecord
+from app.services.graph_service import format_graph_context, retrieve_graph
 from app.services.rag_service import CRITIC_INSTRUCTIONS
 from app.services.retrieval_service import format_context, retrieve
 from app.services.tmdb_service import AVAILABLE_FUNCTIONS, TMDB_TOOL_SCHEMA
@@ -25,7 +26,7 @@ def _client() -> OpenAI:
     return OpenAI(api_key=api_key)
 
 
-def _system_prompt(mode: ChatMode, rag_context: str | None) -> str:
+def _system_prompt(mode: ChatMode, rag_context: str | None, graph_context: str | None = None) -> str:
     if mode == "llm":
         return (
             f"{CRITIC_INSTRUCTIONS} Answer from general film knowledge only. "
@@ -36,6 +37,21 @@ def _system_prompt(mode: ChatMode, rag_context: str | None) -> str:
             f"{CRITIC_INSTRUCTIONS} Use the local film knowledge-base excerpts below. "
             "If the documents do not cover the question, say so.\n\n"
             f"{rag_context}"
+        )
+    if mode == "graph":
+        return (
+            f"{CRITIC_INSTRUCTIONS} Answer only from the knowledge-graph facts below. "
+            "Combine facts across edges when the question needs it, and name the facts you used. "
+            "If the facts do not contain the answer, say that the knowledge graph does not cover it "
+            "instead of answering from general knowledge.\n\n"
+            f"{graph_context}"
+        )
+    if mode == "graph_rag":
+        return (
+            f"{CRITIC_INSTRUCTIONS} Use the knowledge-graph facts for names, credits and "
+            "relationships, and the document excerpts for plot, style and themes. "
+            "If neither covers the question, say so.\n\n"
+            f"{graph_context}\n\nDocument excerpts:\n{rag_context}"
         )
     return (
         f"{CRITIC_INSTRUCTIONS} Always use the local knowledge-base excerpts first. "
@@ -64,13 +80,18 @@ def generate_reply(
     sources: list[Source] = []
     tools_used: list[ToolCallRecord] = []
     rag_context = None
+    graph_context = None
 
-    if mode in ("rag", "rag_tmdb"):
+    if mode in ("rag", "rag_tmdb", "graph_rag"):
         sources = retrieve(user_message)
         rag_context = format_context(sources)
+    if mode in ("graph", "graph_rag"):
+        graph_sources = retrieve_graph(user_message)
+        graph_context = format_graph_context(graph_sources)
+        sources = graph_sources + sources
 
     messages: list[dict] = [
-        {"role": "system", "content": _system_prompt(mode, rag_context)},
+        {"role": "system", "content": _system_prompt(mode, rag_context, graph_context)},
         *_history_messages(history),
         {"role": "user", "content": user_message},
     ]

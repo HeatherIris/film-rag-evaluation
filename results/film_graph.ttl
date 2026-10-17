@@ -1,0 +1,438 @@
+@prefix film: <http://example.org/film/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rel: <http://example.org/film/rel/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+film:A_Bizarre_Love_Triangle rdfs:label "A Bizarre Love Triangle" ;
+    rel:release_year "2002"^^xsd:gYear ;
+    rel:written_by film:Park_Chan_wook .
+
+film:A_Dream_of_a_Dream rdfs:label "A Dream of a Dream" ;
+    rel:directed_by film:Park_Chan_wook ;
+    rel:release_year "2022"^^xsd:gYear .
+
+film:Anarchist rdfs:label "Anarchist" ;
+    rel:release_year "2000"^^xsd:gYear ;
+    rel:written_by film:Park_Chan_wook .
+
+film:Boy_Goes_to_Heaven rdfs:label "Boy Goes to Heaven" ;
+    rel:release_year "2005"^^xsd:gYear ;
+    rel:written_by film:Park_Chan_wook .
+
+film:Crush_and_Blush rdfs:label "Crush and Blush" ;
+    rel:release_year "2008"^^xsd:gYear ;
+    rel:written_by film:Park_Chan_wook .
+
+film:Day_Trip rdfs:label "Day Trip" ;
+    rel:directed_by film:Park_Chan_wook ;
+    rel:release_year "2012"^^xsd:gYear .
+
+film:Decision_to_Leave rdfs:label "Decision to Leave" ;
+    rel:cinematography_by film:Kim_Ji_yong ;
+    rel:directed_by film:Park_Chan_wook ;
+    rel:distributed_by film:CJ_Entertainment,
+        film:Edko_Films,
+        film:GARAGEPLAY_Korea,
+        film:MUBI ;
+    rel:edited_by film:Kim_Sang_bum ;
+    rel:in_language film:Korean,
+        film:Mandarin ;
+    rel:music_by film:Cho_Young_wuk ;
+    rel:produced_by film:Koh_Tae_suk ;
+    rel:production_company film:Moho_Film ;
+    rel:release_year "2022"^^xsd:gYear ;
+    rel:stars film:Ko_Kyung_pyo,
+        film:Lee_Jung_hyun,
+        film:Park_Hae_il,
+        film:Tang_Wei ;
+    rel:written_by film:Jeong_Seo_kyung,
+        film:Park_Chan_wook .
+
+film:Double_Indemnity rdfs:label "Double Indemnity" ;
+    rel:directed_by film:Billy_Wilder ;
+    rel:has_genre film:Film_noir ;
+    rel:release_year "1944"^^xsd:gYear ;
+    rel:stars film:Barbara_Stanwyck,
+        film:Edward_G_Robinson,
+        film:Fred_MacMurray .
+
+film:Gilda rdfs:label "Gilda" ;
+    rel:directed_by film:Charles_Vidor ;
+    rel:has_genre film:Film_noir ;
+    rel:release_year "1946"^^xsd:gYear ;
+    rel:stars film:Glenn_Ford,
+        film:Rita_Hayworth .
+
+film:I_m_a_Cyborg_But_That_s_OK rdfs:label "I'm a Cyborg, But That's OK" ;
+    rel:directed_by film:Park_Chan_wook ;
+    rel:release_year "2006"^^xsd:gYear .
+
+film:If_You_Were_Me rdfs:label "If You Were Me" ;
+    rel:directed_by film:Park_Chan_wook ;
+    rel:release_year "2003"^^xsd:gYear .
+
+film:It_Can_t_Be_Helped rdfs:label "It Can't Be Helped" ;
+    rel:directed_by film:Park_Chan_wook ;
+    rel:release_year "2025"^^xsd:gYear .
+
+film:Joint_Security_Area rdfs:label "Joint Security Area" ;
+    rel:directed_by film:Park_Chan_wook ;
+    rel:release_year "2000"^^xsd:gYear .
+
+film:Judgement rdfs:label "Judgement" ;
+    rel:directed_by film:Park_Chan_wook ;
+    rel:release_year "1999"^^xsd:gYear .
+
+film:Laura rdfs:label "Laura" ;
+    rel:directed_by film:Otto_Preminger ;
+    rel:has_genre film:Film_noir ;
+    rel:release_year "1944"^^xsd:gYear ;
+    rel:stars film:Dana_Andrews,
+        film:Gene_Tierney .
+
+film:Night_Fishing rdfs:label "Night Fishing" ;
+    rel:directed_by film:Park_Chan_wook ;
+    rel:release_year "2011"^^xsd:gYear .
+
+film:Oldboy rdfs:label "Oldboy" ;
+    rel:directed_by film:Park_Chan_wook ;
+    rel:release_year "2003"^^xsd:gYear .
+
+film:Out_of_the_Past rdfs:label "Out of the Past" ;
+    rel:directed_by film:Jacques_Tourneur ;
+    rel:has_genre film:Film_noir ;
+    rel:release_year "1947"^^xsd:gYear ;
+    rel:stars film:Jane_Greer,
+        film:Robert_Mitchum .
+
+film:Snowpiercer rdfs:label "Snowpiercer" ;
+    rel:produced_by film:Park_Chan_wook ;
+    rel:release_year "2013"^^xsd:gYear .
+
+film:Stoker rdfs:label "Stoker" ;
+    rel:cinematography_by film:Chung_Chung_hoon ;
+    rel:directed_by film:Park_Chan_wook ;
+    rel:distributed_by film:Fox_Searchlight_Pictures ;
+    rel:edited_by film:Nicolas_De_Toth ;
+    rel:in_language film:English ;
+    rel:music_by film:Clint_Mansell ;
+    rel:produced_by film:Michael_Costigan,
+        film:Ridley_Scott,
+        film:Tony_Scott ;
+    rel:production_company film:Indian_Paintbrush,
+        film:Scott_Free_Productions ;
+    rel:release_year "2013"^^xsd:gYear ;
+    rel:stars film:Alden_Ehrenreich,
+        film:Dermot_Mulroney,
+        film:Jacki_Weaver,
+        film:Judith_Godr_che,
+        film:Lucas_Till,
+        film:Matthew_Goode,
+        film:Mia_Wasikowska,
+        film:Nicole_Kidman,
+        film:Phyllis_Somerville ;
+    rel:written_by film:Wentworth_Miller .
+
+film:Sunset_Boulevard rdfs:label "Sunset Boulevard" ;
+    rel:directed_by film:Billy_Wilder ;
+    rel:has_genre film:Film_noir ;
+    rel:release_year "1950"^^xsd:gYear ;
+    rel:stars film:Gloria_Swanson,
+        film:William_Holden .
+
+film:Sympathy_for_Lady_Vengeance rdfs:label "Sympathy for Lady Vengeance" ;
+    rel:directed_by film:Park_Chan_wook ;
+    rel:release_year "2005"^^xsd:gYear .
+
+film:Sympathy_for_Mr_Vengeance rdfs:label "Sympathy for Mr. Vengeance" ;
+    rel:directed_by film:Park_Chan_wook ;
+    rel:release_year "2002"^^xsd:gYear .
+
+film:The_Big_Sleep rdfs:label "The Big Sleep" ;
+    rel:directed_by film:Howard_Hawks ;
+    rel:has_genre film:Film_noir ;
+    rel:release_year "1946"^^xsd:gYear ;
+    rel:stars film:Humphrey_Bogart,
+        film:Lauren_Bacall .
+
+film:The_Handmaiden rdfs:label "The Handmaiden" ;
+    rel:adapted_from film:Fingersmith ;
+    rel:cinematography_by film:Chung_Chung_hoon ;
+    rel:directed_by film:Park_Chan_wook ;
+    rel:distributed_by film:CJ_Entertainment ;
+    rel:edited_by film:Kim_Jae_bum,
+        film:Kim_Sang_bum ;
+    rel:has_genre film:Drama,
+        film:Erotic,
+        film:LGBTQ,
+        film:Mystery ;
+    rel:in_language film:Japanese,
+        film:Korean ;
+    rel:music_by film:Cho_Young_wuk ;
+    rel:produced_by film:Park_Chan_wook,
+        film:Syd_Lim ;
+    rel:production_company film:Moho_Film ;
+    rel:release_year "2016"^^xsd:gYear ;
+    rel:stars film:Cho_Jin_woong,
+        film:Ha_Jung_woo,
+        film:Kim_Min_hee,
+        film:Kim_Tae_ri ;
+    rel:written_by film:Jeong_Seo_kyung,
+        film:Park_Chan_wook .
+
+film:The_Humanist rdfs:label "The Humanist" ;
+    rel:release_year "2001"^^xsd:gYear ;
+    rel:written_by film:Park_Chan_wook .
+
+film:The_Little_Drummer_Girl rdfs:label "The Little Drummer Girl" ;
+    rel:directed_by film:Park_Chan_wook ;
+    rel:release_year "2018"^^xsd:gYear .
+
+film:The_Maltese_Falcon rdfs:label "The Maltese Falcon" ;
+    rel:directed_by film:John_Huston ;
+    rel:has_genre film:Film_noir ;
+    rel:release_year "1941"^^xsd:gYear ;
+    rel:stars film:Humphrey_Bogart,
+        film:Mary_Astor,
+        film:Peter_Lorre,
+        film:Sydney_Greenstreet .
+
+film:The_Moon_Is_The_Sun_s_Dream rdfs:label "The Moon Is... The Sun's Dream" ;
+    rel:directed_by film:Park_Chan_wook ;
+    rel:release_year "1992"^^xsd:gYear .
+
+film:The_Postman_Always_Rings_Twice rdfs:label "The Postman Always Rings Twice" ;
+    rel:directed_by film:Tay_Garnett ;
+    rel:has_genre film:Film_noir ;
+    rel:release_year "1946"^^xsd:gYear ;
+    rel:stars film:John_Garfield,
+        film:Lana_Turner .
+
+film:The_Sympathizer rdfs:label "The Sympathizer" ;
+    rel:directed_by film:Park_Chan_wook ;
+    rel:release_year "2024"^^xsd:gYear .
+
+film:The_Third_Man rdfs:label "The Third Man" ;
+    rel:directed_by film:Carol_Reed ;
+    rel:has_genre film:Film_noir ;
+    rel:release_year "1949"^^xsd:gYear ;
+    rel:stars film:Joseph_Cotten,
+        film:Orson_Welles .
+
+film:Thirst rdfs:label "Thirst" ;
+    rel:directed_by film:Park_Chan_wook ;
+    rel:release_year "2009"^^xsd:gYear .
+
+film:Three_Extremes rdfs:label "Three... Extremes" ;
+    rel:directed_by film:Park_Chan_wook ;
+    rel:release_year "2004"^^xsd:gYear .
+
+film:Touch_of_Evil rdfs:label "Touch of Evil" ;
+    rel:directed_by film:Orson_Welles ;
+    rel:has_genre film:Film_noir ;
+    rel:release_year "1958"^^xsd:gYear ;
+    rel:stars film:Charlton_Heston,
+        film:Janet_Leigh,
+        film:Orson_Welles .
+
+film:Trio rdfs:label "Trio" ;
+    rel:directed_by film:Park_Chan_wook ;
+    rel:release_year "1997"^^xsd:gYear .
+
+film:War_Ran rdfs:label "War, Ran" ;
+    rel:release_year "2024"^^xsd:gYear ;
+    rel:written_by film:Park_Chan_wook .
+
+film:Ahn_Jung_yeon rdfs:label "Ahn Jung-yeon" .
+
+film:Alden_Ehrenreich rdfs:label "Alden Ehrenreich" .
+
+film:Aunt_Gwendolyn_Gin_Stoker rdfs:label "Aunt Gwendolyn “Gin” Stoker" .
+
+film:Barbara_Stanwyck rdfs:label "Barbara Stanwyck" .
+
+film:Carol_Reed rdfs:label "Carol Reed" .
+
+film:Charles_Vidor rdfs:label "Charles Vidor" .
+
+film:Charlie_Stoker rdfs:label "Charlie Stoker" .
+
+film:Charlton_Heston rdfs:label "Charlton Heston" .
+
+film:Cho_Jin_woong rdfs:label "Cho Jin-woong" .
+
+film:Clint_Mansell rdfs:label "Clint Mansell" .
+
+film:Dana_Andrews rdfs:label "Dana Andrews" .
+
+film:Dermot_Mulroney rdfs:label "Dermot Mulroney" ;
+    rel:plays film:Richard_Stoker .
+
+film:Drama rdfs:label "Drama" .
+
+film:Edko_Films rdfs:label "Edko Films" .
+
+film:Edward_G_Robinson rdfs:label "Edward G. Robinson" .
+
+film:English rdfs:label "English" .
+
+film:Erotic rdfs:label "Erotic" .
+
+film:Evelyn_Stoker rdfs:label "Evelyn Stoker" .
+
+film:Fingersmith rdfs:label "Fingersmith" ;
+    rel:release_year "2002"^^xsd:gYear ;
+    rel:written_by film:Sarah_Waters .
+
+film:Fox_Searchlight_Pictures rdfs:label "Fox Searchlight Pictures" .
+
+film:Fred_MacMurray rdfs:label "Fred MacMurray" .
+
+film:GARAGEPLAY_Korea rdfs:label "GARAGEPLAY Korea" .
+
+film:Gene_Tierney rdfs:label "Gene Tierney" .
+
+film:Glenn_Ford rdfs:label "Glenn Ford" .
+
+film:Gloria_Swanson rdfs:label "Gloria Swanson" .
+
+film:Ha_Jung_woo rdfs:label "Ha Jung-woo" .
+
+film:Hae_jun rdfs:label "Hae-jun" .
+
+film:Howard_Hawks rdfs:label "Howard Hawks" .
+
+film:India_Stoker rdfs:label "India Stoker" .
+
+film:Indian_Paintbrush rdfs:label "Indian Paintbrush" .
+
+film:Jacki_Weaver rdfs:label "Jacki Weaver" ;
+    rel:plays film:Aunt_Gwendolyn_Gin_Stoker .
+
+film:Jacques_Tourneur rdfs:label "Jacques Tourneur" .
+
+film:Jane_Greer rdfs:label "Jane Greer" .
+
+film:Janet_Leigh rdfs:label "Janet Leigh" .
+
+film:Japanese rdfs:label "Japanese" .
+
+film:John_Garfield rdfs:label "John Garfield" .
+
+film:John_Huston rdfs:label "John Huston" .
+
+film:Joseph_Cotten rdfs:label "Joseph Cotten" .
+
+film:Judith_Godr_che rdfs:label "Judith Godrèche" .
+
+film:Kim_Jae_bum rdfs:label "Kim Jae-bum" .
+
+film:Kim_Ji_yong rdfs:label "Kim Ji-yong" .
+
+film:Kim_Min_hee rdfs:label "Kim Min-hee" .
+
+film:Kim_Tae_ri rdfs:label "Kim Tae-ri" .
+
+film:Ko_Kyung_pyo rdfs:label "Ko Kyung-pyo" ;
+    rel:plays film:Suh_Woo_won .
+
+film:Koh_Tae_suk rdfs:label "Koh Tae-suk" .
+
+film:LGBTQ rdfs:label "LGBTQ" .
+
+film:Lana_Turner rdfs:label "Lana Turner" .
+
+film:Lauren_Bacall rdfs:label "Lauren Bacall" .
+
+film:Lee_Jung_hyun rdfs:label "Lee Jung-hyun" ;
+    rel:plays film:Ahn_Jung_yeon .
+
+film:Lucas_Till rdfs:label "Lucas Till" .
+
+film:MUBI rdfs:label "MUBI" .
+
+film:Mandarin rdfs:label "Mandarin" .
+
+film:Mary_Astor rdfs:label "Mary Astor" .
+
+film:Matthew_Goode rdfs:label "Matthew Goode" ;
+    rel:plays film:Charlie_Stoker .
+
+film:Mia_Wasikowska rdfs:label "Mia Wasikowska" ;
+    rel:plays film:India_Stoker .
+
+film:Michael_Costigan rdfs:label "Michael Costigan" .
+
+film:Mystery rdfs:label "Mystery" .
+
+film:Nicolas_De_Toth rdfs:label "Nicolas De Toth" .
+
+film:Nicole_Kidman rdfs:label "Nicole Kidman" ;
+    rel:plays film:Evelyn_Stoker .
+
+film:Otto_Preminger rdfs:label "Otto Preminger" .
+
+film:Park_Hae_il rdfs:label "Park Hae-il" ;
+    rel:plays film:Hae_jun .
+
+film:Peter_Lorre rdfs:label "Peter Lorre" .
+
+film:Phyllis_Somerville rdfs:label "Phyllis Somerville" .
+
+film:Richard_Stoker rdfs:label "Richard Stoker" .
+
+film:Ridley_Scott rdfs:label "Ridley Scott" .
+
+film:Rita_Hayworth rdfs:label "Rita Hayworth" .
+
+film:Robert_Mitchum rdfs:label "Robert Mitchum" .
+
+film:Sarah_Waters rdfs:label "Sarah Waters" .
+
+film:Scott_Free_Productions rdfs:label "Scott Free Productions" .
+
+film:Seo_rae rdfs:label "Seo-rae" .
+
+film:Suh_Woo_won rdfs:label "Suh Woo-won" .
+
+film:Syd_Lim rdfs:label "Syd Lim" .
+
+film:Sydney_Greenstreet rdfs:label "Sydney Greenstreet" .
+
+film:Tang_Wei rdfs:label "Tang Wei" ;
+    rel:plays film:Seo_rae .
+
+film:Tay_Garnett rdfs:label "Tay Garnett" .
+
+film:Tony_Scott rdfs:label "Tony Scott" .
+
+film:Wentworth_Miller rdfs:label "Wentworth Miller" .
+
+film:William_Holden rdfs:label "William Holden" .
+
+film:Billy_Wilder rdfs:label "Billy Wilder" .
+
+film:CJ_Entertainment rdfs:label "CJ Entertainment" .
+
+film:Chung_Chung_hoon rdfs:label "Chung Chung-hoon" .
+
+film:Humphrey_Bogart rdfs:label "Humphrey Bogart" .
+
+film:Kim_Sang_bum rdfs:label "Kim Sang-bum" .
+
+film:Korean rdfs:label "Korean" .
+
+film:Moho_Film rdfs:label "Moho Film" .
+
+film:Cho_Young_wuk rdfs:label "Cho Young-wuk" .
+
+film:Jeong_Seo_kyung rdfs:label "Jeong Seo-kyung" .
+
+film:Orson_Welles rdfs:label "Orson Welles" .
+
+film:Film_noir rdfs:label "Film noir" .
+
+film:Park_Chan_wook rdfs:label "Park Chan-wook" ;
+    rel:collaborates_with film:Cho_Young_wuk,
+        film:Jeong_Seo_kyung .
+

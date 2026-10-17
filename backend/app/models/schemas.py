@@ -3,7 +3,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-ChatMode = Literal["llm", "rag", "rag_tmdb"]
+ChatMode = Literal["llm", "rag", "rag_tmdb", "graph", "graph_rag"]
 
 
 class ConversationCreate(BaseModel):
