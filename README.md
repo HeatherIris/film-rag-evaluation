@@ -220,4 +220,5 @@ The following items are planned, not implemented:
 - automatic factual-accuracy scoring
 - batch evaluation datasets, including a Graph vs RAG comparison
 - LLM-based entity and relation extraction from the plot and theme paragraphs
+- scene-level knowledge layer (scenes, events, cross-scene links, attributed interpretations); see [docs/scene_knowledge_design.md](docs/scene_knowledge_design.md)
 - richer memory, including automatic summaries
