@@ -11,7 +11,7 @@
 
 ## 阶段 0:代码上 GitHub
 
-- [ ] 把 `graph-retrieval` 分支推上 GitHub(本地用 `git am graph_retrieval.patch`,或给 Claude 授权后让它推)
+- [x] 把 `graph-retrieval` 分支推上 GitHub(本地用 `git am graph_retrieval.patch`,或给 Claude 授权后让它推)
 - [ ] 用真实 OpenAI 密钥启动一次应用,在评估页试 Graph、Graph + RAG 各一个问题
 - [ ] 确认无误后把 `graph-retrieval` 合并到 `main`
 
