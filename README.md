@@ -2,6 +2,8 @@
 
 A full-stack film-domain AI assistant built with React, FastAPI, retrieval-augmented generation, a small film knowledge graph, TMDB tool calling, persistent conversation memory, and an evaluation workspace for comparing different answer-generation strategies.
 
+Progress checklist and next steps: [docs/ROADMAP.md](docs/ROADMAP.md).
+
 This project started as a university film assistant prototype and has since been restructured into a modular AI application for experimenting with domain-specific retrieval, tool use, memory, and evaluation.
 
 ## Current Capabilities
