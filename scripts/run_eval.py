@@ -1,8 +1,8 @@
 """Run every question in a question CSV through the selected modes and write a CSV to grade by hand.
 
-    python scripts/run_eval.py data/eval/handmaiden_questions.csv
-    python scripts/run_eval.py data/eval/handmaiden_questions.csv --modes scene_vector scene_graph
-    python scripts/run_eval.py data/eval/handmaiden_questions.csv --retrieval-only   # no chat calls
+    python scripts/run_eval.py data/eval/dtl_questions.csv
+    python scripts/run_eval.py data/eval/dtl_questions.csv --modes scene_vector scene_graph
+    python scripts/run_eval.py data/eval/dtl_questions.csv --retrieval-only   # no chat calls
 
 Default modes are the five conditions of docs/scene_knowledge_design.md:
 A rag, B scene_vector, C graph_rag, D scene_graph, E scene_full.

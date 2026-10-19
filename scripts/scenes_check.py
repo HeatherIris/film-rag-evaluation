@@ -1,7 +1,7 @@
 """Validate the scene notes and export them to results/scenes_<film>.json. No API key needed.
 
     python scripts/scenes_check.py                  # every film in data/scenes/
-    python scripts/scenes_check.py the_handmaiden   # one film
+    python scripts/scenes_check.py decision_to_leave   # one film
     python scripts/scenes_check.py --show s03       # also print how a scene is given to the model
 
 Exit code 1 if any problem is found, so it can run before every commit.

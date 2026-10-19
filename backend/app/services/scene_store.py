@@ -18,7 +18,7 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 SCENES_DIR = PROJECT_ROOT / "data" / "scenes"
 
-LINK_PREDICATES = {"retells", "same_object", "follows_from", "contradicts"}
+LINK_PREDICATES = {"same_object", "refers_back_to", "follows_from", "contradicts", "retells"}
 SCENE_ID = re.compile(r"^s\d{2,3}$")
 EVENT_ID = re.compile(r"^e\d+$")
 CLAIM_ID = re.compile(r"^c\d+$")

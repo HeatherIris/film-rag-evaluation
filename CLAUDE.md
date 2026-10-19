@@ -25,11 +25,11 @@ These files are the gold reference of the experiment. Their content must come fr
 ```bash
 pip install -r backend/requirements.txt
 cd backend && python -m pytest -q tests          # fictional demo film, no API key
-python scripts/scenes_check.py the_handmaiden    # validate scene notes
+python scripts/scenes_check.py decision_to_leave    # validate scene notes
 python scripts/graph_demo.py                     # metadata graph retrieval demo
 python scripts/run_eval.py data/eval/<file>.csv [--retrieval-only]
 python scripts/summarize_eval.py results/eval/<graded file>.csv
-python scripts/extract_scenes.py the_handmaiden
+python scripts/extract_scenes.py decision_to_leave
 cd frontend && npx tsc -b                        # type check
 ```
 

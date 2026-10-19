@@ -1,6 +1,6 @@
 """Create data/scenes/<film>/<scene_id>.md from the template.
 
-    python scripts/new_scene.py the_handmaiden s01
+    python scripts/new_scene.py decision_to_leave s01
 """
 
 from __future__ import annotations

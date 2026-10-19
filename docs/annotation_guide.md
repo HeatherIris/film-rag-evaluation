@@ -39,8 +39,10 @@ python scripts/extract_scenes.py ...  ← LLM 抽取 vs 你的标注
 
 目标是让图结构**有机会**发挥作用,同时也保留它不起作用的情况。
 
-1. **成对的场景优先。** 《小姐》第二部分会从另一视角重述第一部分的事件。至少找 4 对"同一事件、两个视角"的场景,它们之间写 `retells` 链接。
-2. **反复出现的物品。** 某个物品在相隔很远的两个场景出现,写 `same_object`。
+1. **前后呼应的场景优先。** 《分手的决心》分前后两部分。前半部分的话、物品和地点,会在后半部分再次出现,而且意思常常变了。至少找 4 对这样的场景:
+   - 同一个物品在相隔很远的两个场景出现,写 `same_object`;
+   - 后面场景里的一句话或一个动作指向前面的场景,写 `refers_back_to`。
+2. **只出现一次的重要物品不用登记成跨场景物品**,直接写在场景里即可。
 3. **因果。** 后一个场景是前一个的直接后果,写 `follows_from`。
 4. **反转。** 后一个场景揭示前一个场景看到的并非真相,写 `contradicts`。
 5. **加 3–4 个独立场景**:不和其他场景相连。用来检验单场景问题,也防止整套数据只偏向图。
@@ -57,40 +59,40 @@ data/scenes/
 ├── _template/            模板,不要改
 │   ├── film.md
 │   └── scene.md
-└── the_handmaiden/
+└── decision_to_leave/
     ├── film.md           人名、物品名和别名
     ├── s01.md            每个场景一个文件
     ├── s02.md
     └── ...
 data/eval/
-└── handmaiden_questions.csv   你的问题表(从 _template_questions.csv 复制)
+└── dtl_questions.csv         你的问题表(从 _template_questions.csv 复制)
 ```
 
 新建场景文件:
 
 ```bash
-python scripts/new_scene.py the_handmaiden s01
+python scripts/new_scene.py decision_to_leave s01
 ```
 
-它会把模板复制成 `data/scenes/the_handmaiden/s01.md`,你用任意文本编辑器(VS Code、Typora 都行)打开填写。
+它会把模板复制成 `data/scenes/decision_to_leave/s01.md`,你用任意文本编辑器(VS Code、Typora 都行)打开填写。
 
 **为什么用 Markdown 模板而不是直接写 JSON:** 手写 JSON 容易漏逗号和引号,也难读。模板里是固定的标题和列表,
-`scripts/scenes_check.py` 会把它严格解析成 JSON(输出到 `results/scenes_the_handmaiden.json`),这一步**不经过 AI**,
+`scripts/scenes_check.py` 会把它严格解析成 JSON(输出到 `results/scenes_decision_to_leave.json`),这一步**不经过 AI**,
 所以 JSON 里的每个字都来自你。
 
 ---
 
 ## 4. 先填 film.md
 
-`data/scenes/the_handmaiden/film.md` 已经按演员表预填了四个主要人物,请你**看片时核对**并补充别名:
+`data/scenes/decision_to_leave/film.md` 已经按 `data/rag/Decision_to_leave.md` 的演员表预填了四个人物,请你**看片时核对**,补充别名,并加上你需要的其他人物(比如两任丈夫):
 
 ```markdown
 ## Characters
 
-- Sook-hee | <片中对她的其他称呼>
-- Hideko
-- Count Fujiwara | the Count, Count
-- Kouzuki | Uncle Kouzuki
+- Hae-jun | Jang Hae-jun, Hae-joon
+- Seo-rae | Song Seo-rae
+- Jung-yeon | Ahn Jung-yeon
+- Woo-won | Suh Woo-won
 
 ## Objects
 
@@ -115,7 +117,7 @@ scene_id: s03
 part: 1
 start: 00:18:00
 end: 00:20:30
-pov: Sook-hee
+pov: Hae-jun
 location: <地点>
 verified: no
 verified_on:
@@ -123,7 +125,7 @@ verified_on:
 ```
 
 - `start` / `end`:播放器显示的时间,精确到分钟即可,格式 `00:18:00`。
-- `pov`:这场戏从谁的视角讲述。《小姐》每部分的视角不同,这个字段很重要。
+- `pov`:这场戏主要跟着谁的视角。如果某场戏的视角和前后不同,一定要记下来。
 - `verified`:先写 `no`。核实之后才改成 `yes`,并填写 `verified_on: 2026-10-25`。
 
 ### 5.2 Description(最重要)
@@ -168,7 +170,7 @@ verified_on:
 ### 5.6 Links(跨场景关系)
 
 ```
-- e1 retells s09.e2 | note: same event seen from Hideko's side
+- e1 refers_back_to s04.e2 | note: repeats what was said in s04
 - e1 same_object s01.e3
 - scene follows_from s02
 - e2 contradicts s04.e1 | unverified
@@ -178,10 +180,11 @@ verified_on:
 
 | 关系 | 什么时候用 |
 | --- | --- |
-| `retells` | 两个场景展示**同一事件**,视角或信息不同 |
 | `same_object` | 本场景的某个物品和那个场景的是**同一个实物**(不只是同一种东西) |
+| `refers_back_to` | 本场景的一句话或一个动作**指向**那个场景(比如重提那时说过的话) |
 | `follows_from` | 本场景的事件是那个场景事件的直接后果 |
 | `contradicts` | 本场景揭示那个场景看到的(或暗示的)不是真相 |
+| `retells` | 两个场景展示**同一事件**,视角不同(这部电影用得不多,保留给其他电影) |
 
 - 方向约定:**写在后面的场景里,指向前面的场景**。系统检索时两个方向都会走,所以每对场景只写一次。
 - 能指向具体事件(`s09.e2`)就不要只指向场景(`s09`)。
@@ -201,7 +204,7 @@ verified_on:
 ### 5.8 写完一个场景就检查
 
 ```bash
-python scripts/scenes_check.py the_handmaiden --show s03
+python scripts/scenes_check.py decision_to_leave --show s03
 ```
 
 它会列出所有问题(时间格式不对、人物不在名单里、物品没登记、链接指向不存在的场景、解释没有依据等),
@@ -223,7 +226,7 @@ python scripts/scenes_check.py the_handmaiden --show s03
 4. 核对时间:误差在 30 秒内即可。
 5. 一个场景核完,把 `verified: yes` 和 `verified_on: <日期>` 填上,单独提交一次:
    ```bash
-   git add data/scenes/the_handmaiden/s03.md
+   git add data/scenes/decision_to_leave/s03.md
    git commit -m "Verify s03 against the film"
    ```
    这样 git 历史就是你的核实记录,面试时可以展示。
@@ -238,7 +241,7 @@ python scripts/scenes_check.py the_handmaiden --show s03
 复制模板:
 
 ```bash
-cp data/eval/_template_questions.csv data/eval/handmaiden_questions.csv
+cp data/eval/_template_questions.csv data/eval/dtl_questions.csv
 ```
 
 用 Excel、Numbers 或 Google Sheets 打开编辑,保存为 CSV(UTF-8)。列的含义:
@@ -263,7 +266,7 @@ cp data/eval/_template_questions.csv data/eval/handmaiden_questions.csv
 - unanswerable 问题要像真问题,不要写明显荒谬的问题。
 - 写完后提交并打 tag,冻结问题集:
   ```bash
-  git add data/eval/handmaiden_questions.csv
+  git add data/eval/dtl_questions.csv
   git commit -m "Freeze evaluation questions v1"
   git tag eval-questions-v1
   ```
@@ -287,14 +290,14 @@ cp data/eval/_template_questions.csv data/eval/handmaiden_questions.csv
 
 如果你更想先随手写自由笔记,再整理成模板,可以这样做:
 
-1. 自由笔记放在仓库外面,或者放进 `data/scenes/the_handmaiden/drafts/`(这个目录不会被解析)。
+1. 自由笔记放在仓库外面,或者放进 `data/scenes/decision_to_leave/drafts/`(这个目录不会被解析)。
 2. 对 Claude Code 说(原样复制,替换文件名):
 
-   > Reformat my draft `data/scenes/the_handmaiden/drafts/s03.txt` into `data/scenes/the_handmaiden/s03.md`
+   > Reformat my draft `data/scenes/decision_to_leave/drafts/s03.txt` into `data/scenes/decision_to_leave/s03.md`
    > following `data/scenes/_template/scene.md`. Rules: do not add, remove, merge or reword any content;
    > every event line must correspond to one sentence or clause in my draft; if something in the draft does
    > not fit a section, put it in a `<!-- unplaced: ... -->` comment instead of guessing; leave `verified: no`;
-   > do not use any knowledge of the film. Then run `python scripts/scenes_check.py the_handmaiden` and show me
+   > do not use any knowledge of the film. Then run `python scripts/scenes_check.py decision_to_leave` and show me
    > the diff. Do not commit.
 
 3. 用 `git diff` 逐行看它改了什么,确认没有新增内容后再自己提交。
@@ -308,10 +311,10 @@ cp data/eval/_template_questions.csv data/eval/handmaiden_questions.csv
 ## 9. 打分(运行之后)
 
 ```bash
-python scripts/run_eval.py data/eval/handmaiden_questions.csv
+python scripts/run_eval.py data/eval/dtl_questions.csv
 ```
 
-结果在 `results/eval/handmaiden_questions_<时间>.csv`。每个问题 × 每个条件一行,`evidence_recall` 已自动算好
+结果在 `results/eval/dtl_questions_<时间>.csv`。每个问题 × 每个条件一行,`evidence_recall` 已自动算好
 (系统给模型看的场景里,包含了多少你标的依据场景)。你需要填最后五列:
 
 | 列 | 取值 | 怎么判断 |
@@ -334,7 +337,7 @@ python scripts/run_eval.py data/eval/handmaiden_questions.csv
 打完分运行:
 
 ```bash
-python scripts/summarize_eval.py results/eval/handmaiden_questions_<时间>.csv
+python scripts/summarize_eval.py results/eval/dtl_questions_<时间>.csv
 ```
 
 会生成同名的 `_summary.md`,按条件和题型汇总。只有一部电影、约 40 题,结果只能当作**案例统计**,
@@ -355,15 +358,15 @@ python scripts/summarize_eval.py results/eval/handmaiden_questions_<时间>.csv
 ```bash
 pip install -r backend/requirements.txt
 
-python scripts/new_scene.py the_handmaiden s01           # 新建场景文件
-python scripts/scenes_check.py the_handmaiden            # 检查全部场景,导出 JSON
-python scripts/scenes_check.py the_handmaiden --show s01 # 看模型拿到的样子
+python scripts/new_scene.py decision_to_leave s01           # 新建场景文件
+python scripts/scenes_check.py decision_to_leave            # 检查全部场景,导出 JSON
+python scripts/scenes_check.py decision_to_leave --show s01 # 看模型拿到的样子
 
 export OPENAI_API_KEY=...
-python scripts/run_eval.py data/eval/handmaiden_questions.csv --retrieval-only  # 只看检索,不调用回答
-python scripts/run_eval.py data/eval/handmaiden_questions.csv                   # A–E 全部
+python scripts/run_eval.py data/eval/dtl_questions.csv --retrieval-only  # 只看检索,不调用回答
+python scripts/run_eval.py data/eval/dtl_questions.csv                   # A–E 全部
 python scripts/summarize_eval.py results/eval/<文件>.csv                         # 打分后汇总
-python scripts/extract_scenes.py the_handmaiden                                  # LLM 抽取 vs 人工标注
+python scripts/extract_scenes.py decision_to_leave                                  # LLM 抽取 vs 人工标注
 
 cd backend && python -m pytest -q tests                  # 代码自测(用虚构的示例电影,不需要密钥)
 ```

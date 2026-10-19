@@ -6,7 +6,7 @@ docs/scene_knowledge_design.md:
 
 - retrieve_scenes_vector: embed every event line and scene description, return the best scenes.
 - retrieve_scenes_graph: the same vector seeds, plus scenes that share a named object or all named
-  characters with the question, plus scenes one link away (retells / same_object / ...).
+  characters with the question, plus scenes one link away (same_object / refers_back_to / ...).
 - all_scene_context: every scene, no retrieval.
 """
 

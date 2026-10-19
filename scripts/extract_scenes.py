@@ -1,7 +1,7 @@
 """LLM extraction experiment: rebuild scene records from the Description paragraphs only, then
 compare them with the hand-written records.
 
-    python scripts/extract_scenes.py the_handmaiden
+    python scripts/extract_scenes.py decision_to_leave
 
 The model sees each scene's Description, the canonical character / object names from film.md, and
 the Descriptions of the other scenes (so it can propose links). It never sees the Events, Objects,
@@ -39,9 +39,10 @@ Return JSON with exactly these keys:
 {{"characters": [names], "objects": [short object names],
   "events": [{{"agent": name, "action": "what is visibly done", "objects": [names]}}],
   "links": [{{"predicate": one of {predicates}, "target": other scene id, "reason": "short"}}]}}
-Link meanings: retells = the other scene shows the same event from another view; same_object = an object
-here is the same physical object as there; follows_from = this scene is a consequence of the other;
-contradicts = this scene shows that the other scene's version was false.
+Link meanings: same_object = an object here is the same physical object as there; refers_back_to = something
+said or done here points back to the other scene; follows_from = this scene is a consequence of the other;
+contradicts = this scene shows that the other scene's version was false; retells = the other scene shows
+the same event from another view.
 Only propose a link if the descriptions support it.
 
 Scene {scene_id} description:

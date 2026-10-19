@@ -64,9 +64,10 @@ Known limitations:
 
 ### Scene-level knowledge (in progress)
 
-The metadata graph cannot answer what happens in a scene or how two distant scenes relate. The scene layer adds
-hand-written, verified scene notes: events, objects, point of view, cross-scene links (`retells`, `same_object`,
-`follows_from`, `contradicts`) and attributed interpretations that must cite events.
+The metadata graph cannot answer what happens in a scene or how two distant scenes are connected. The scene
+layer adds scene notes that I write by hand and check against the film: events, objects, point of view, links
+between scenes (`same_object`, `refers_back_to`, `follows_from`, `contradicts`, `retells`) and interpretations.
+Each interpretation must name its source and the events it is based on.
 
 - Design and experiment plan: [docs/scene_knowledge_design.md](docs/scene_knowledge_design.md)
 - How to write, verify and grade (the manual part): [docs/annotation_guide.md](docs/annotation_guide.md)
@@ -74,8 +75,8 @@ hand-written, verified scene notes: events, objects, point of view, cross-scene 
 - Scripts: `new_scene.py`, `scenes_check.py`, `run_eval.py`, `summarize_eval.py`, `extract_scenes.py`
 - Tests: `cd backend && python -m pytest -q tests` (uses a small fictional film, no API key)
 
-Status: the code is tested on the fictional film only. Scene notes for *The Handmaiden* and the question set
-have not been written yet, so there are no results.
+Status: the code is only tested on a small fictional film. I have not yet written the scene notes for
+*Decision to Leave* or the question set, so there are no results yet.
 
 ### TMDB tool integration
 
@@ -241,6 +242,6 @@ The following items are planned, not implemented:
 - groundedness scoring
 - hallucination analysis
 - automatic factual-accuracy scoring
-- run the scene experiment on *The Handmaiden* (notes and questions to be written)
+- run the scene experiment on *Decision to Leave* (notes and questions to be written)
 - LLM-based entity and relation extraction from the plot and theme paragraphs
 - richer memory, including automatic summaries

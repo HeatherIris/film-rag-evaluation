@@ -1,155 +1,165 @@
 # Scene-level Knowledge Layer: Design
 
-Status: code implemented and tested on a fictional demo film (`backend/tests/`). The scene notes for
-*The Handmaiden* and the question set are not written yet, so no results exist. Annotation steps: `docs/annotation_guide.md`.
+Status: the code is written and tested on a small fictional film (`backend/tests/`). I have not yet
+written the scene notes for *Decision to Leave* or the question set, so there are no results yet.
+The manual steps are described in `docs/annotation_guide.md`.
 
 ## 1. Why
 
-The current graph (`graph_build.py`) only holds film metadata: credits, cast, genre, filmography.
-That answers questions such as "who edited both films", but not the questions this assistant was
-started for: what happens in a scene, who does what, how two distant scenes relate, and what a
+The current graph (`graph_build.py`) only contains film metadata: credits, cast, genre and filmography.
+It can answer questions such as "who edited both films". It cannot answer the questions I started this
+assistant for: what happens in a scene, who does what, how two distant scenes are connected, and what a
 shot or gesture might mean.
 
-| Layer | Example question | What it needs |
-| --- | --- | --- |
-| L1 Facts | Who shot *The Handmaiden*? | metadata (current graph, TMDB) |
-| L2 Scene recall | When Part 2 shows an event already seen in Part 1, what does it reveal that Part 1 hid? | scene-level records, links between scenes |
-| L3 Interpretation | Why is this scene shown twice from different sides? | L2 evidence plus attributed readings |
+I divide film questions into three levels:
 
-L2 is the target of this design. L3 is supported only as attributed claims that point to L2 evidence;
-the assistant does not produce "the" meaning of a scene.
+| Level | Example question | What it needs |
+| --- | --- | --- |
+| L1 Facts | Who shot *Decision to Leave*? | metadata (current graph, TMDB) |
+| L2 Scene recall | Where did this object first appear, and what happened to it then? | scene notes and links between scenes |
+| L3 Interpretation | Why does the film bring this object back at the end? | L2 evidence plus readings with a named source |
+
+This design targets L2. L3 is only supported as readings that name their source and point to L2
+evidence. The assistant should not claim to give "the" meaning of a scene.
 
 Research question:
 
-> Can scene-level structured knowledge improve the accuracy and traceability of detailed film
-> question answering, and when does a graph structure help beyond plain retrieval over the same notes?
+> Can structured scene-level knowledge make detailed film questions easier to answer correctly and to
+> trace back to evidence? And when does a graph help more than plain retrieval over the same notes?
 
-## 2. Pilot film: *The Handmaiden*
+## 2. Pilot film: *Decision to Leave*
 
-- Already in the knowledge base (`data/rag/The_Handmaiden.md`).
-- Its three-part structure retells events from a second character's point of view. The same event appears
-  in two distant scenes, which is exactly the kind of cross-scene link a graph can encode and text
-  similarity can miss.
-- 12–15 key scenes, annotated by me from my own viewing. Time stamps are approximate.
+- It is already in the knowledge base (`data/rag/Decision_to_leave.md`).
+- The film has two parts. The first part follows one case. The second part starts about a year later
+  with a new case. Words, objects and places from the first part come back in the second part, often
+  with a different meaning. To answer questions about them, the system has to connect scenes that are
+  far apart in the film. Text similarity may miss these connections, and an explicit link can keep them.
+- I will annotate 12–15 key scenes from my own viewing. Time stamps are approximate.
 
-Copyright: the repository stores only my own short notes, time positions and citations.
-No video, subtitles, or script text.
+Copyright: the repository only stores my own short notes, time positions and citations.
+It does not store video, subtitles or script text.
 
 ## 3. Data model
 
-Scene notes are written by hand as Markdown from a fixed template (easier to write than JSON) and
-parsed without any LLM into JSON (`scripts/scenes_check.py` → `results/scenes_<film>.json`).
+I write scene notes by hand in Markdown, using a fixed template. This is easier than writing JSON.
+A script then turns them into JSON without using an LLM
+(`scripts/scenes_check.py` → `results/scenes_<film>.json`).
 
 ```
 data/scenes/
 ├── _template/{film.md, scene.md}
-└── the_handmaiden/
-    ├── film.md      canonical character / object names and aliases
+└── decision_to_leave/
+    ├── film.md      canonical names of characters and objects, with aliases
     └── s01.md ...   one file per scene
 ```
 
-A scene file has a front-matter block (`scene_id`, `part`, `start`, `end`, `pov`, `location`, `verified`,
-`verified_on`) and these sections:
+Each scene file starts with a header (`scene_id`, `part`, `start`, `end`, `pov`, `location`, `verified`,
+`verified_on`) and has these sections:
 
 | Section | Content |
 | --- | --- |
-| Description | 3–6 sentences in my own words; the only input of the extraction experiment |
-| Characters | names, mapped to canonical names via `film.md` |
+| Description | 3–6 sentences in my own words. This is the only input of the extraction experiment. |
+| Characters | names, mapped to canonical names through `film.md` |
 | Events | `e1 \| agent \| observable action \| objects: a, b \| uncertain` |
 | Objects | objects in the scene |
-| Dialogue summary | paraphrase, no long quotes |
-| Camera | framing, movement, light, sound I noticed |
-| Links | `e1 retells s09.e2 \| unverified \| note: ...` |
+| Dialogue summary | paraphrase only, no long quotes |
+| Camera | framing, movement, light and sound that I noticed |
+| Links | `e1 refers_back_to s04.e2 \| unverified \| note: ...` |
 | Interpretations | `c1 \| attributed to \| reading \| supports: s03.e1, s09.e2` |
 
-Link predicates:
+Link types:
 
-| Predicate | Meaning |
+| Link | Meaning |
 | --- | --- |
-| `retells` | scene B shows the same event as scene A from another point of view |
 | `same_object` | an object in scene B is the same physical object as in scene A |
+| `refers_back_to` | something said or done in scene B points back to scene A |
 | `follows_from` | an event in B is a consequence of an event in A |
-| `contradicts` | B reveals that what A showed (or implied) was false |
+| `contradicts` | B shows that what A showed (or suggested) was not true |
+| `retells` | B shows the same event as A from another point of view (kept for other films) |
 
-Links are written in the later scene and point back; retrieval follows them in both directions.
-Unverified links are flagged in the prompt and counted separately. Interpretations are never graph
-edges between facts; each one must cite the events it rests on.
+A link is written in the later scene and points back to the earlier one. Retrieval follows links in
+both directions. Links that I could not confirm are marked `unverified`; they are flagged in the prompt
+and counted separately. Interpretations are never stored as links between facts, and each one must
+name the events it is based on.
 
-`backend/app/services/scene_store.py` parses and validates the files (unknown names, objects not listed,
-links to missing scenes or events, interpretations without evidence, verified without a date).
+`backend/app/services/scene_store.py` reads and checks the files. It reports unknown names, objects that
+are not listed, links to missing scenes or events, interpretations without evidence, and scenes marked
+as verified without a date.
 
 ## 4. Pipeline
 
-1. **Gold notes**: I write the scene records and links by hand.
-2. **Automatic extraction**: give an LLM my prose scene descriptions (not the JSON) and ask it for the
-   same schema. Compare with the gold notes: missed events, invented events, wrong or invented links.
-   This is the "LLM-based KG construction" part, measured against a reference rather than assumed to work.
-3. **Graph**: load scene, event, character, object nodes and links next to the existing metadata graph.
-4. **Retrieval**: entity and object matching plus vector search over event text; graph expansion
-   along `retells` / `same_object` / `follows_from`; return scene ids as evidence.
-5. **Answer format**: three labelled parts: *Observed in the film* (with scene ids and time),
-   *Interpretation* (with attribution), *Not covered by the notes*.
+1. **Reference notes.** I write the scene records and links by hand.
+2. **Automatic extraction.** An LLM receives my written scene descriptions (not the JSON) and is asked
+   for the same structure. I compare its output with my notes: which events it misses, which it invents,
+   and which links are wrong. This is the "LLM-based knowledge graph construction" part. It is measured
+   against a reference instead of being assumed to work.
+3. **Graph.** Scenes, events, characters, objects and links are loaded next to the existing metadata graph.
+4. **Retrieval.** Names and objects in the question are matched, events are searched by vector similarity,
+   and the graph is expanded by one step along the links. Scene ids are returned as evidence.
+5. **Answer format.** Three labelled parts: *Observed in the film* (with scene ids and times),
+   *Interpretation* (with its source) and *Not covered by the notes*.
 
 ## 5. Experiment
 
 ### Conditions
 
 Modes in `chat_service.py`: A `rag`, B `scene_vector`, C `graph_rag`, D `scene_graph`, E `scene_full`.
-All scene modes share one answer format (Observed in the film / Interpretation / Not covered) and also
-receive the document excerpts, so the conditions differ only in how scene knowledge is selected.
-`scene_graph` = vector seeds + scenes sharing a named object (or all named characters) + one hop along links.
+All scene modes use the same answer format and also receive the document excerpts, so they only differ
+in how scene knowledge is selected. `scene_graph` starts from the vector results, adds scenes that share
+a named object (or all named characters), and then follows links one step.
 
 | | Metadata only | + verified scene notes |
 | --- | --- | --- |
 | Vector RAG | A | B |
-| Hybrid graph | C | D |
+| Graph + RAG | C | D |
 | Full context (all notes in the prompt, no retrieval) | – | E |
 
-E matters most. With 15 scenes, every note fits in the prompt, so retrieval is not needed and E is the
-likely upper bound. A graph is only worth arguing for if it helps where E stops working. To test that,
-repeat B / D / E after adding distractor material (the other films' documents and scene notes from a
-second film) and report how each condition degrades.
+E is the most important comparison. With about 15 scenes, all notes fit into the prompt, so retrieval may
+not be needed at all, and E may give the best answers. A graph is only worth using if it helps when E
+stops working. To test this, I will run B, D and E again after adding distractor material (documents
+about the other films and scene notes from a second film) and see how each condition changes.
 
 ### Questions (about 40, written before running any system)
 
 | Type | Count | Example shape |
 | --- | --- | --- |
 | L1 metadata | 6 | credits, years |
-| L2 single scene | 10 | what happens / who is present |
-| L2 cross-scene | 12 | the event shown again later, the object's first appearance |
-| L3 interpretation | 6 | why / what might it mean |
-| Unanswerable from the notes | 6 | the system should say it does not know |
+| L2 single scene | 10 | what happens, who is present |
+| L2 cross-scene | 12 | where an object first appeared, what a later line refers back to |
+| L3 interpretation | 6 | why, what it might mean |
+| Not answerable from the notes | 6 | the system should say that it does not know |
 
 ### Measures
 
-- Answer correctness against a reference answer (manual rubric: correct / partial / wrong).
-- Evidence correctness: are the cited scene ids the ones that support the answer?
-- Abstention: correct "not covered" on unanswerable questions; false abstentions elsewhere.
-- Error location for every wrong answer: missing knowledge / retrieval miss / wrong extraction or link /
-  correct evidence but wrong answer.
+- Answer correctness against a reference answer (graded by hand: correct / partial / wrong).
+- Evidence: do the cited scene ids really support the answer?
+- Abstention: does the system say "not covered" when it should, and only then?
+- Error location for every wrong answer: missing knowledge, retrieval miss, wrong note or link,
+  or correct evidence but a wrong answer.
 - Latency and prompt size.
 
-With about 40 questions on one film, results are case studies, not statistically significant claims.
-Report per-question tables and error categories.
+With about 40 questions on one film, the results are a case study. They cannot support claims of
+statistical significance. I will report a table per question and the error categories.
 
-## 6. Milestones
+## 6. Steps
 
-1. Annotate 12–15 scenes and the links; write the 40 questions and references.
-2. Load scenes into the graph; add vector index over events; condition E.
-3. Run A–E once, fill the result table, write up errors.
-4. LLM extraction vs gold notes.
-5. Distractor/scale run.
+1. Annotate 12–15 scenes and their links; write the 40 questions and reference answers.
+2. Load the scenes into the graph; add a vector index over events; add condition E.
+3. Run A–E once, fill in the results table and write up the errors.
+4. Compare LLM extraction with my notes.
+5. Run the distractor experiment.
 
 ## 7. Related work to read
 
-- MovieGraphs (Vicol et al., CVPR 2018): graph annotations of human-centric situations in 7,637 clips from 51 films.
-- MovieNet (Huang et al., ECCV 2020): multimodal movie understanding dataset (scenes, characters, places, actions).
-- MovieQA (Tapaswi et al., CVPR 2016): question answering over films from plots, subtitles, scripts and video.
-- DrVideo (Ma et al., CVPR 2025): turns long video into a text document, retrieves key frames, adds detail back.
-- VideoStir (Fu et al., ACL 2026): clip-level spatio-temporal graph with multi-hop retrieval for long video.
+- MovieGraphs (Vicol et al., CVPR 2018): graph annotations of human-centred situations in 7,637 clips from 51 films.
+- MovieNet (Huang et al., ECCV 2020): a multimodal dataset for film understanding (scenes, characters, places, actions).
+- MovieQA (Tapaswi et al., CVPR 2016): question answering about films from plots, subtitles, scripts and video.
+- DrVideo (Ma et al., CVPR 2025): turns a long video into a text document, retrieves key frames and adds detail back.
+- VideoStir (Fu et al., ACL 2026): a clip-level spatio-temporal graph with multi-hop retrieval for long videos.
 
 ## 8. What can be claimed now
 
-- Built: a metadata knowledge graph from the film documents, graph and graph + RAG modes, RDF export.
-- Designed, not built: scene-level layer and the experiment above.
-- Not claimed: video understanding, automatic graph construction from full films, any accuracy improvement.
+- Built: a metadata knowledge graph from the film documents, Graph and Graph + RAG modes, and an RDF export.
+- Built and tested only on a fictional film: the scene layer and the evaluation scripts.
+- Not yet done: scene notes and questions for *Decision to Leave*, and any results.
+- Not claimed: video understanding, automatic graph construction from full films, or any accuracy improvement.

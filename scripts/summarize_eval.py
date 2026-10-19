@@ -1,6 +1,6 @@
 """Summarize a graded evaluation CSV by condition and question type.
 
-    python scripts/summarize_eval.py results/eval/handmaiden_questions_20261020_1400.csv
+    python scripts/summarize_eval.py results/eval/dtl_questions_20261020_1400.csv
 
 Grading values (see docs/annotation_guide.md):
   correctness     correct | partial | wrong
